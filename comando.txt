@@ -1,0 +1,1 @@
+ php artisan make:controller /Historico/MetadataActaController --resource --model=/Models/Historico/MetadataActa

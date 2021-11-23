@@ -1,94 +1,8 @@
 /*==============================================================*/
 /* DBMS name:      PostgreSQL 9.x                               */
-/* Created on:     18/11/2021 10:57:38 p. m.                    */
+/* Created on:     18/11/2021 09:36:36 p. m.                    */
 /*==============================================================*/
 
-
-drop index CORE_UNIDADES_PK;
-
-drop table CORE_UNIDADES;
-
-drop index ESTUDIANTES_PK;
-
-drop table ESTUDIANTES;
-
-drop index GD_ACUERDO_CATALOGO_PK;
-
-drop table GD_ACUERDO_CATALOGO;
-
-drop index GD_ARCHIVO_PK;
-
-drop table GD_ARCHIVO;
-
-drop index ESPECIFICA_FK;
-
-drop index GD_ASUNTO_CATALOGO_PK;
-
-drop table GD_ASUNTO_CATALOGO;
-
-drop index DESCRIBE_FK;
-
-drop index DETALLE_ARCHIVO_FK;
-
-drop index DETALLE_ARCHIVO2_FK;
-
-drop index ALMACENA_FK;
-
-drop index GD_DETALLE_ARCHIVO_PK;
-
-drop table GD_DETALLE_ARCHIVO;
-
-drop index GD_ESTADO_ITEM_PK;
-
-drop table GD_ESTADO_ITEM;
-
-drop index GD_FORMATO_DOCUMENTO_PK;
-
-drop table GD_FORMATO_DOCUMENTO;
-
-drop index PERTENECE_A_FK;
-
-drop index AGRUPA_FK;
-
-drop index GESTIONO_FK;
-
-drop index GD_ITEM_PK;
-
-drop table GD_ITEM;
-
-drop index PERTENCE_FK;
-
-drop index TIENE_UN_FK;
-
-drop index CLASIFICA_FK;
-
-drop index ES_FK;
-
-drop index GD_METADATA_PK;
-
-drop table GD_METADATA;
-
-drop index GD_METADATA_ACTA_PK;
-
-drop table GD_METADATA_ACTA;
-
-drop index TIENE_COLABORADORES_FK;
-
-drop index GD_PERSONA_ASOCIADA_PK;
-
-drop table GD_PERSONA_ASOCIADA;
-
-drop index GD_TEMPORADA_GESTION_PK;
-
-drop table GD_TEMPORADA_GESTION;
-
-drop index GD_TIPO_DOCUMENTO_PK;
-
-drop table GD_TIPO_DOCUMENTO;
-
-drop index RH_PERSONAL_PK;
-
-drop table RH_PERSONAL;
 
 /*==============================================================*/
 /* Table: CORE_UNIDADES                                         */
@@ -103,21 +17,6 @@ create table CORE_UNIDADES (
 /*==============================================================*/
 create unique index CORE_UNIDADES_PK on CORE_UNIDADES (
 CODIGO
-);
-
-/*==============================================================*/
-/* Table: ESTUDIANTES                                           */
-/*==============================================================*/
-create table ESTUDIANTES (
-   CARNET               VARCHAR(10)          not null,
-   constraint PK_ESTUDIANTES primary key (CARNET)
-);
-
-/*==============================================================*/
-/* Index: ESTUDIANTES_PK                                        */
-/*==============================================================*/
-create unique index ESTUDIANTES_PK on ESTUDIANTES (
-CARNET
 );
 
 /*==============================================================*/
@@ -286,7 +185,7 @@ create table GD_ITEM (
    ID                   SERIAL               not null,
    ID_GD_TEMPORADA_GESTION INT4                 null,
    ID_GD_TEMPORADA_CATALOGO INT4                 null,
-   ID_GD_TIPO_DOCUMENTO VARCHAR(10)          null,
+   ID_GD_TIPO_DOCUMENTO INT4                 null,
    INFORMACION          TEXT                 null,
    UPDATED_AT           DATE                 null,
    CREATED_AT           DATE                 null,
@@ -448,22 +347,37 @@ ID
 );
 
 /*==============================================================*/
-/* Table: GD_TIPO_DOCUMENTO                                     */
+/* Table: GD_TIPO                                               */
 /*==============================================================*/
-create table GD_TIPO_DOCUMENTO (
-   NOMBRE_CORTO         VARCHAR(10)          not null,
+create table GD_TIPO (
+   ID                   SERIAL               not null,
    NOMBRE               VARCHAR(200)         not null,
    DESCRIPCION          VARCHAR(400)         null,
    UPDATED_AT           DATE                 null,
    CREATED_AT           DATE                 null,
-   constraint PK_GD_TIPO_DOCUMENTO primary key (NOMBRE_CORTO)
+   constraint PK_GD_TIPO primary key (ID)
 );
 
 /*==============================================================*/
-/* Index: GD_TIPO_DOCUMENTO_PK                                  */
+/* Index: GD_TIPO_PK                                            */
 /*==============================================================*/
-create unique index GD_TIPO_DOCUMENTO_PK on GD_TIPO_DOCUMENTO (
-NOMBRE_CORTO
+create unique index GD_TIPO_PK on GD_TIPO (
+ID
+);
+
+/*==============================================================*/
+/* Table: REAC_ALUMNO                                           */
+/*==============================================================*/
+create table REAC_ALUMNO (
+   CARNET               VARCHAR(10)          not null,
+   constraint PK_REAC_ALUMNO primary key (CARNET)
+);
+
+/*==============================================================*/
+/* Index: ESTUDIANTES_PK                                        */
+/*==============================================================*/
+create unique index ESTUDIANTES_PK on REAC_ALUMNO (
+CARNET
 );
 
 /*==============================================================*/
@@ -518,8 +432,8 @@ alter table GD_ITEM
       on delete restrict on update restrict;
 
 alter table GD_ITEM
-   add constraint FK_GD_ITEM_PERTENECE_GD_TIPO_ foreign key (ID_GD_TIPO_DOCUMENTO)
-      references GD_TIPO_DOCUMENTO (NOMBRE_CORTO)
+   add constraint FK_GD_ITEM_PERTENECE_GD_TIPO foreign key (ID_GD_TIPO_DOCUMENTO)
+      references GD_TIPO (ID)
       on delete restrict on update restrict;
 
 alter table GD_METADATA
