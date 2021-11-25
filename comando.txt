@@ -1,1 +1,3 @@
- php artisan make:controller /Historico/MetadataActaController --resource --model=/Models/Historico/MetadataActa
+php artisan make:controller /Historico/FormatoDocumentoController --resource --model=/Models/Historico/FormatoDocumento
+ 
+ php artisan make:request /Historico/AcuerdoCatalogoRequest

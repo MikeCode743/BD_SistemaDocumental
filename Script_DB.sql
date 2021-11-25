@@ -1,6 +1,6 @@
 /*==============================================================*/
 /* DBMS name:      PostgreSQL 9.x                               */
-/* Created on:     18/11/2021 10:57:38 p. m.                    */
+/* Created on:     25/11/2021 01:45:58 p. m.                    */
 /*==============================================================*/
 
 
@@ -8,9 +8,13 @@ drop index CORE_UNIDADES_PK;
 
 drop table CORE_UNIDADES;
 
-drop index ESTUDIANTES_PK;
+drop index ASUNTO_METADATA_ACUERDO_FK;
 
-drop table ESTUDIANTES;
+drop index METADATA_ACUERDO_ASUNTO_FK;
+
+drop index DETALLE_ASUNTO_PK;
+
+drop table DETALLE_ASUNTO;
 
 drop index GD_ACUERDO_CATALOGO_PK;
 
@@ -60,8 +64,6 @@ drop index PERTENCE_FK;
 
 drop index TIENE_UN_FK;
 
-drop index CLASIFICA_FK;
-
 drop index ES_FK;
 
 drop index GD_METADATA_PK;
@@ -106,18 +108,34 @@ CODIGO
 );
 
 /*==============================================================*/
-/* Table: ESTUDIANTES                                           */
+/* Table: DETALLE_ASUNTO                                        */
 /*==============================================================*/
-create table ESTUDIANTES (
-   CARNET               VARCHAR(10)          not null,
-   constraint PK_ESTUDIANTES primary key (CARNET)
+create table DETALLE_ASUNTO (
+   ID_GD_ASUNTO_CATALOGO INT4                 not null,
+   ID_GD_METADATA_ACUERDO INT4                 not null,
+   constraint PK_DETALLE_ASUNTO primary key (ID_GD_ASUNTO_CATALOGO, ID_GD_METADATA_ACUERDO)
 );
 
 /*==============================================================*/
-/* Index: ESTUDIANTES_PK                                        */
+/* Index: DETALLE_ASUNTO_PK                                     */
 /*==============================================================*/
-create unique index ESTUDIANTES_PK on ESTUDIANTES (
-CARNET
+create unique index DETALLE_ASUNTO_PK on DETALLE_ASUNTO (
+ID_GD_ASUNTO_CATALOGO,
+ID_GD_METADATA_ACUERDO
+);
+
+/*==============================================================*/
+/* Index: METADATA_ACUERDO_ASUNTO_FK                            */
+/*==============================================================*/
+create  index METADATA_ACUERDO_ASUNTO_FK on DETALLE_ASUNTO (
+ID_GD_METADATA_ACUERDO
+);
+
+/*==============================================================*/
+/* Index: ASUNTO_METADATA_ACUERDO_FK                            */
+/*==============================================================*/
+create  index ASUNTO_METADATA_ACUERDO_FK on DETALLE_ASUNTO (
+ID_GD_ASUNTO_CATALOGO
 );
 
 /*==============================================================*/
@@ -170,8 +188,6 @@ create table GD_ASUNTO_CATALOGO (
    ID_GD_ACUERDO_CATALOGO INT4                 null,
    NOMBRE               VARCHAR(200)         not null,
    DESCRIPCION          VARCHAR(400)         null,
-   UPDATED_AT           DATE                 null,
-   CREATED_AT           DATE                 null,
    constraint PK_GD_ASUNTO_CATALOGO primary key (ID)
 );
 
@@ -327,8 +343,7 @@ ID_GD_TIPO_DOCUMENTO
 create table GD_METADATA (
    ID                   SERIAL               not null,
    ID_GD_ESTADO_ITEM    INT4                 null,
-   ID_GD_TIPO_DOCUMENTO INT4                 null,
-   ID_GD_ASUNTO_CATALOGO INT4                 null,
+   ID_GD_FORMATO_DOCUMENTO INT4                 null,
    CODIGO_CORE_UNIDAD   VARCHAR(10)          null,
    TITULO               VARCHAR(500)         null,
    TITULO_ALTERNATIVO   VARCHAR(500)         null,
@@ -359,14 +374,7 @@ ID
 /* Index: ES_FK                                                 */
 /*==============================================================*/
 create  index ES_FK on GD_METADATA (
-ID_GD_TIPO_DOCUMENTO
-);
-
-/*==============================================================*/
-/* Index: CLASIFICA_FK                                          */
-/*==============================================================*/
-create  index CLASIFICA_FK on GD_METADATA (
-ID_GD_ASUNTO_CATALOGO
+ID_GD_FORMATO_DOCUMENTO
 );
 
 /*==============================================================*/
@@ -390,6 +398,8 @@ create table GD_METADATA_ACTA (
    ID                   SERIAL               not null,
    NUMERO_ACTA          VARCHAR(200)         null,
    PERIODO_GESTION      TEXT                 null,
+   UPDATED_AT           DATE                 null,
+   CREATED_AT           DATE                 null,
    constraint PK_GD_METADATA_ACTA primary key (ID)
 );
 
@@ -482,6 +492,16 @@ create unique index RH_PERSONAL_PK on RH_PERSONAL (
 ID_RRHH
 );
 
+alter table DETALLE_ASUNTO
+   add constraint FK_DETALLE__ASUNTO_ME_GD_ASUNT foreign key (ID_GD_ASUNTO_CATALOGO)
+      references GD_ASUNTO_CATALOGO (ID)
+      on delete restrict on update restrict;
+
+alter table DETALLE_ASUNTO
+   add constraint FK_DETALLE__METADATA__GD_METAD foreign key (ID_GD_METADATA_ACUERDO)
+      references GD_METADATA (ID)
+      on delete restrict on update restrict;
+
 alter table GD_ASUNTO_CATALOGO
    add constraint FK_GD_ASUNT_ESPECIFIC_GD_ACUER foreign key (ID_GD_ACUERDO_CATALOGO)
       references GD_ACUERDO_CATALOGO (ID)
@@ -523,12 +543,7 @@ alter table GD_ITEM
       on delete restrict on update restrict;
 
 alter table GD_METADATA
-   add constraint FK_GD_METAD_CLASIFICA_GD_ASUNT foreign key (ID_GD_ASUNTO_CATALOGO)
-      references GD_ASUNTO_CATALOGO (ID)
-      on delete restrict on update restrict;
-
-alter table GD_METADATA
-   add constraint FK_GD_METAD_ES_GD_FORMA foreign key (ID_GD_TIPO_DOCUMENTO)
+   add constraint FK_GD_METAD_ES_GD_FORMA foreign key (ID_GD_FORMATO_DOCUMENTO)
       references GD_FORMATO_DOCUMENTO (ID)
       on delete restrict on update restrict;
 
