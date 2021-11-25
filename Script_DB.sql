@@ -1,6 +1,6 @@
 /*==============================================================*/
 /* DBMS name:      PostgreSQL 9.x                               */
-/* Created on:     25/11/2021 01:45:58 p. m.                    */
+/* Created on:     25/11/2021 03:43:40 p. m.                    */
 /*==============================================================*/
 
 
@@ -36,8 +36,6 @@ drop index DETALLE_ARCHIVO_FK;
 
 drop index DETALLE_ARCHIVO2_FK;
 
-drop index ALMACENA_FK;
-
 drop index GD_DETALLE_ARCHIVO_PK;
 
 drop table GD_DETALLE_ARCHIVO;
@@ -50,15 +48,11 @@ drop index GD_FORMATO_DOCUMENTO_PK;
 
 drop table GD_FORMATO_DOCUMENTO;
 
-drop index PERTENECE_A_FK;
+drop index TEMPORADA_GESTION_FK;
 
-drop index AGRUPA_FK;
+drop index GD_METADATA_ACTA_PK;
 
-drop index GESTIONO_FK;
-
-drop index GD_ITEM_PK;
-
-drop table GD_ITEM;
+drop table GD_METADATA_ACTA;
 
 drop index PERTENCE_FK;
 
@@ -66,13 +60,9 @@ drop index TIENE_UN_FK;
 
 drop index ES_FK;
 
-drop index GD_METADATA_PK;
+drop index GD_METADATA_ACUERDO_PK;
 
-drop table GD_METADATA;
-
-drop index GD_METADATA_ACTA_PK;
-
-drop table GD_METADATA_ACTA;
+drop table GD_METADATA_ACUERDO;
 
 drop index TIENE_COLABORADORES_FK;
 
@@ -83,10 +73,6 @@ drop table GD_PERSONA_ASOCIADA;
 drop index GD_TEMPORADA_GESTION_PK;
 
 drop table GD_TEMPORADA_GESTION;
-
-drop index GD_TIPO_DOCUMENTO_PK;
-
-drop table GD_TIPO_DOCUMENTO;
 
 drop index RH_PERSONAL_PK;
 
@@ -164,7 +150,6 @@ create table GD_ARCHIVO (
    ID                   SERIAL               not null,
    NOMBRE               VARCHAR(200)         not null,
    RUTA_ALMACENADO      TEXT                 not null,
-   NOMENCLATURA         TEXT                 not null,
    TIPO_MIME            TEXT                 not null,
    ESPACIO_DISCO        INT4                 not null,
    NUM_VERSION          INT4                 null,
@@ -211,34 +196,25 @@ ID_GD_ACUERDO_CATALOGO
 create table GD_DETALLE_ARCHIVO (
    ID                   SERIAL               not null,
    ID_GD_ARCHIVO        INT4                 null,
-   ID_GD_METADATA       INT4                 null,
-   ID_GD_ITEM           INT4                 not null,
+   ID_GD_METADATA_ACUERDO INT4                 null,
    ID_GD_METADATA_ACTA  INT4                 null,
    UPDATED_AT           DATE                 null,
    CREATED_AT           DATE                 null,
-   constraint PK_GD_DETALLE_ARCHIVO primary key (ID, ID_GD_ITEM)
+   constraint PK_GD_DETALLE_ARCHIVO primary key (ID)
 );
 
 /*==============================================================*/
 /* Index: GD_DETALLE_ARCHIVO_PK                                 */
 /*==============================================================*/
 create unique index GD_DETALLE_ARCHIVO_PK on GD_DETALLE_ARCHIVO (
-ID,
-ID_GD_ITEM
-);
-
-/*==============================================================*/
-/* Index: ALMACENA_FK                                           */
-/*==============================================================*/
-create  index ALMACENA_FK on GD_DETALLE_ARCHIVO (
-ID_GD_ITEM
+ID
 );
 
 /*==============================================================*/
 /* Index: DETALLE_ARCHIVO2_FK                                   */
 /*==============================================================*/
 create  index DETALLE_ARCHIVO2_FK on GD_DETALLE_ARCHIVO (
-ID_GD_METADATA
+ID_GD_METADATA_ACUERDO
 );
 
 /*==============================================================*/
@@ -296,51 +272,36 @@ ID
 );
 
 /*==============================================================*/
-/* Table: GD_ITEM                                               */
+/* Table: GD_METADATA_ACTA                                      */
 /*==============================================================*/
-create table GD_ITEM (
+create table GD_METADATA_ACTA (
    ID                   SERIAL               not null,
    ID_GD_TEMPORADA_GESTION INT4                 null,
-   ID_GD_TEMPORADA_CATALOGO INT4                 null,
-   ID_GD_TIPO_DOCUMENTO VARCHAR(10)          null,
-   INFORMACION          TEXT                 null,
+   NUMERO_ACTA          VARCHAR(200)         null,
+   PERIODO_GESTION      TEXT                 null,
    UPDATED_AT           DATE                 null,
    CREATED_AT           DATE                 null,
-   constraint PK_GD_ITEM primary key (ID)
+   constraint PK_GD_METADATA_ACTA primary key (ID)
 );
 
 /*==============================================================*/
-/* Index: GD_ITEM_PK                                            */
+/* Index: GD_METADATA_ACTA_PK                                   */
 /*==============================================================*/
-create unique index GD_ITEM_PK on GD_ITEM (
+create unique index GD_METADATA_ACTA_PK on GD_METADATA_ACTA (
 ID
 );
 
 /*==============================================================*/
-/* Index: GESTIONO_FK                                           */
+/* Index: TEMPORADA_GESTION_FK                                  */
 /*==============================================================*/
-create  index GESTIONO_FK on GD_ITEM (
+create  index TEMPORADA_GESTION_FK on GD_METADATA_ACTA (
 ID_GD_TEMPORADA_GESTION
 );
 
 /*==============================================================*/
-/* Index: AGRUPA_FK                                             */
+/* Table: GD_METADATA_ACUERDO                                   */
 /*==============================================================*/
-create  index AGRUPA_FK on GD_ITEM (
-ID_GD_TEMPORADA_CATALOGO
-);
-
-/*==============================================================*/
-/* Index: PERTENECE_A_FK                                        */
-/*==============================================================*/
-create  index PERTENECE_A_FK on GD_ITEM (
-ID_GD_TIPO_DOCUMENTO
-);
-
-/*==============================================================*/
-/* Table: GD_METADATA                                           */
-/*==============================================================*/
-create table GD_METADATA (
+create table GD_METADATA_ACUERDO (
    ID                   SERIAL               not null,
    ID_GD_ESTADO_ITEM    INT4                 null,
    ID_GD_FORMATO_DOCUMENTO INT4                 null,
@@ -360,54 +321,35 @@ create table GD_METADATA (
    DERECHOS             TEXT                 null,
    UPDATED_AT           DATE                 null,
    CREATED_AT           DATE                 null,
-   constraint PK_GD_METADATA primary key (ID)
+   constraint PK_GD_METADATA_ACUERDO primary key (ID)
 );
 
 /*==============================================================*/
-/* Index: GD_METADATA_PK                                        */
+/* Index: GD_METADATA_ACUERDO_PK                                */
 /*==============================================================*/
-create unique index GD_METADATA_PK on GD_METADATA (
+create unique index GD_METADATA_ACUERDO_PK on GD_METADATA_ACUERDO (
 ID
 );
 
 /*==============================================================*/
 /* Index: ES_FK                                                 */
 /*==============================================================*/
-create  index ES_FK on GD_METADATA (
+create  index ES_FK on GD_METADATA_ACUERDO (
 ID_GD_FORMATO_DOCUMENTO
 );
 
 /*==============================================================*/
 /* Index: TIENE_UN_FK                                           */
 /*==============================================================*/
-create  index TIENE_UN_FK on GD_METADATA (
+create  index TIENE_UN_FK on GD_METADATA_ACUERDO (
 ID_GD_ESTADO_ITEM
 );
 
 /*==============================================================*/
 /* Index: PERTENCE_FK                                           */
 /*==============================================================*/
-create  index PERTENCE_FK on GD_METADATA (
+create  index PERTENCE_FK on GD_METADATA_ACUERDO (
 CODIGO_CORE_UNIDAD
-);
-
-/*==============================================================*/
-/* Table: GD_METADATA_ACTA                                      */
-/*==============================================================*/
-create table GD_METADATA_ACTA (
-   ID                   SERIAL               not null,
-   NUMERO_ACTA          VARCHAR(200)         null,
-   PERIODO_GESTION      TEXT                 null,
-   UPDATED_AT           DATE                 null,
-   CREATED_AT           DATE                 null,
-   constraint PK_GD_METADATA_ACTA primary key (ID)
-);
-
-/*==============================================================*/
-/* Index: GD_METADATA_ACTA_PK                                   */
-/*==============================================================*/
-create unique index GD_METADATA_ACTA_PK on GD_METADATA_ACTA (
-ID
 );
 
 /*==============================================================*/
@@ -458,25 +400,6 @@ ID
 );
 
 /*==============================================================*/
-/* Table: GD_TIPO_DOCUMENTO                                     */
-/*==============================================================*/
-create table GD_TIPO_DOCUMENTO (
-   NOMBRE_CORTO         VARCHAR(10)          not null,
-   NOMBRE               VARCHAR(200)         not null,
-   DESCRIPCION          VARCHAR(400)         null,
-   UPDATED_AT           DATE                 null,
-   CREATED_AT           DATE                 null,
-   constraint PK_GD_TIPO_DOCUMENTO primary key (NOMBRE_CORTO)
-);
-
-/*==============================================================*/
-/* Index: GD_TIPO_DOCUMENTO_PK                                  */
-/*==============================================================*/
-create unique index GD_TIPO_DOCUMENTO_PK on GD_TIPO_DOCUMENTO (
-NOMBRE_CORTO
-);
-
-/*==============================================================*/
 /* Table: RH_PERSONAL                                           */
 /*==============================================================*/
 create table RH_PERSONAL (
@@ -499,17 +422,12 @@ alter table DETALLE_ASUNTO
 
 alter table DETALLE_ASUNTO
    add constraint FK_DETALLE__METADATA__GD_METAD foreign key (ID_GD_METADATA_ACUERDO)
-      references GD_METADATA (ID)
+      references GD_METADATA_ACUERDO (ID)
       on delete restrict on update restrict;
 
 alter table GD_ASUNTO_CATALOGO
    add constraint FK_GD_ASUNT_ESPECIFIC_GD_ACUER foreign key (ID_GD_ACUERDO_CATALOGO)
       references GD_ACUERDO_CATALOGO (ID)
-      on delete restrict on update restrict;
-
-alter table GD_DETALLE_ARCHIVO
-   add constraint FK_GD_DETAL_ALMACENA_GD_ITEM foreign key (ID_GD_ITEM)
-      references GD_ITEM (ID)
       on delete restrict on update restrict;
 
 alter table GD_DETALLE_ARCHIVO
@@ -523,42 +441,32 @@ alter table GD_DETALLE_ARCHIVO
       on delete restrict on update restrict;
 
 alter table GD_DETALLE_ARCHIVO
-   add constraint FK_GD_DETAL_DETALLE_A_GD_METAD foreign key (ID_GD_METADATA)
-      references GD_METADATA (ID)
+   add constraint FK_GD_DETAL_DETALLE_A_GD_METAD foreign key (ID_GD_METADATA_ACUERDO)
+      references GD_METADATA_ACUERDO (ID)
       on delete restrict on update restrict;
 
-alter table GD_ITEM
-   add constraint FK_GD_ITEM_AGRUPA_GD_ACUER foreign key (ID_GD_TEMPORADA_CATALOGO)
-      references GD_ACUERDO_CATALOGO (ID)
-      on delete restrict on update restrict;
-
-alter table GD_ITEM
-   add constraint FK_GD_ITEM_GESTIONO_GD_TEMPO foreign key (ID_GD_TEMPORADA_GESTION)
+alter table GD_METADATA_ACTA
+   add constraint FK_GD_METAD_TEMPORADA_GD_TEMPO foreign key (ID_GD_TEMPORADA_GESTION)
       references GD_TEMPORADA_GESTION (ID)
       on delete restrict on update restrict;
 
-alter table GD_ITEM
-   add constraint FK_GD_ITEM_PERTENECE_GD_TIPO_ foreign key (ID_GD_TIPO_DOCUMENTO)
-      references GD_TIPO_DOCUMENTO (NOMBRE_CORTO)
-      on delete restrict on update restrict;
-
-alter table GD_METADATA
+alter table GD_METADATA_ACUERDO
    add constraint FK_GD_METAD_ES_GD_FORMA foreign key (ID_GD_FORMATO_DOCUMENTO)
       references GD_FORMATO_DOCUMENTO (ID)
       on delete restrict on update restrict;
 
-alter table GD_METADATA
+alter table GD_METADATA_ACUERDO
    add constraint FK_GD_METAD_PERTENCE_CORE_UNI foreign key (CODIGO_CORE_UNIDAD)
       references CORE_UNIDADES (CODIGO)
       on delete restrict on update restrict;
 
-alter table GD_METADATA
+alter table GD_METADATA_ACUERDO
    add constraint FK_GD_METAD_TIENE_UN_GD_ESTAD foreign key (ID_GD_ESTADO_ITEM)
       references GD_ESTADO_ITEM (ID)
       on delete restrict on update restrict;
 
 alter table GD_PERSONA_ASOCIADA
    add constraint FK_GD_PERSO_TIENE_COL_GD_METAD foreign key (ID_GD_METADATA)
-      references GD_METADATA (ID)
+      references GD_METADATA_ACUERDO (ID)
       on delete restrict on update restrict;
 
